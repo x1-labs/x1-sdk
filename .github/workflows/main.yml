@@ -101,6 +101,25 @@ jobs:
       - name: Run checks
         run: ./scripts/check-nightly.sh
 
+  check-downstream-agave:
+    name: Cargo check Agave master
+    runs-on: ubuntu-latest
+    needs: [sanity]
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup
+        with:
+          agave: true
+          stable-toolchain: true
+          cargo-cache-key: cargo-downstream-agave-check
+          cargo-cache-fallback-key: cargo-downstream-agave
+
+      - name: Run checks
+        run: ./scripts/check-downstream-agave.sh
+
   clippy:
     name: Clippy
     needs: [sanity]
