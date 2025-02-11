@@ -30,6 +30,35 @@ pub struct Ed25519SignatureOffsets {
     message_instruction_index: u16,    // index of instruction data to get message data
 }
 
+/// Encode just the signature offsets in a single ed25519 instruction.
+///
+/// This is a convenience function for rare cases where we wish to verify multiple messages in
+/// the same instruction. The verification data can be stored in a separate instruction specified
+/// by the `*_instruction_index` fields of `offsets`, or in this instruction by extending the data
+/// buffer.
+///
+/// Note: If the signer for these messages are the same, it is cheaper to concatenate the messages
+/// and have the signer sign the single buffer and use [`new_ed25519_instruction`].
+pub fn offsets_to_ed25519_instruction(offsets: &[Ed25519SignatureOffsets]) -> Instruction {
+    let mut instruction_data = Vec::with_capacity(
+        SIGNATURE_OFFSETS_START
+            .saturating_add(SIGNATURE_OFFSETS_SERIALIZED_SIZE.saturating_mul(offsets.len())),
+    );
+
+    let num_signatures = offsets.len() as u16;
+    instruction_data.extend_from_slice(&num_signatures.to_le_bytes());
+
+    for offsets in offsets {
+        instruction_data.extend_from_slice(bytes_of(offsets));
+    }
+
+    Instruction {
+        program_id: solana_sdk_ids::ed25519_program::id(),
+        accounts: vec![],
+        data: instruction_data,
+    }
+}
+
 pub fn new_ed25519_instruction(keypair: &ed25519_dalek::Keypair, message: &[u8]) -> Instruction {
     let signature = keypair.sign(message).to_bytes();
     let pubkey = keypair.public.to_bytes();
@@ -188,6 +217,7 @@ fn get_data_slice<'a>(
 pub mod test {
     use {
         super::*,
+        ed25519_dalek::Signer as EdSigner,
         hex,
         rand0_7::{thread_rng, Rng},
         solana_feature_set::FeatureSet,
@@ -410,6 +440,77 @@ pub mod test {
         let privkey = ed25519_dalek::Keypair::generate(&mut thread_rng());
         let message_arr = b"hello";
         let mut instruction = new_ed25519_instruction(&privkey, message_arr);
+        let mint_keypair = Keypair::new();
+        let feature_set = FeatureSet::all_enabled();
+
+        let tx = Transaction::new_signed_with_payer(
+            &[instruction.clone()],
+            Some(&mint_keypair.pubkey()),
+            &[&mint_keypair],
+            Hash::default(),
+        );
+
+        assert!(tx.verify_precompiles(&feature_set).is_ok());
+
+        let index = loop {
+            let index = thread_rng().gen_range(0, instruction.data.len());
+            // byte 1 is not used, so this would not cause the verify to fail
+            if index != 1 {
+                break index;
+            }
+        };
+
+        instruction.data[index] = instruction.data[index].wrapping_add(12);
+        let tx = Transaction::new_signed_with_payer(
+            &[instruction],
+            Some(&mint_keypair.pubkey()),
+            &[&mint_keypair],
+            Hash::default(),
+        );
+        assert!(tx.verify_precompiles(&feature_set).is_err());
+    }
+
+    #[test]
+    fn test_offsets_to_ed25519_instruction() {
+        solana_logger::setup();
+
+        let privkey = ed25519_dalek::Keypair::generate(&mut thread_rng());
+        let messages: [&[u8]; 3] = [b"hello", b"IBRL", b"goodbye"];
+        let data_start =
+            messages.len() * SIGNATURE_OFFSETS_SERIALIZED_SIZE + SIGNATURE_OFFSETS_START;
+        let mut data_offset = data_start + PUBKEY_SERIALIZED_SIZE;
+        let (offsets, messages): (Vec<_>, Vec<_>) = messages
+            .into_iter()
+            .map(|message| {
+                let signature_offset = data_offset;
+                let message_data_offset = signature_offset + SIGNATURE_SERIALIZED_SIZE;
+                data_offset += SIGNATURE_SERIALIZED_SIZE + message.len();
+
+                let offsets = Ed25519SignatureOffsets {
+                    signature_offset: signature_offset as u16,
+                    signature_instruction_index: u16::MAX,
+                    public_key_offset: data_start as u16,
+                    public_key_instruction_index: u16::MAX,
+                    message_data_offset: message_data_offset as u16,
+                    message_data_size: message.len() as u16,
+                    message_instruction_index: u16::MAX,
+                };
+
+                (offsets, message)
+            })
+            .unzip();
+
+        let mut instruction = offsets_to_ed25519_instruction(&offsets);
+
+        let pubkey = privkey.public.as_ref();
+        instruction.data.extend_from_slice(pubkey);
+
+        for message in messages {
+            let signature = privkey.sign(message).to_bytes();
+            instruction.data.extend_from_slice(&signature);
+            instruction.data.extend_from_slice(message);
+        }
+
         let mint_keypair = Keypair::new();
         let feature_set = FeatureSet::all_enabled();
 
