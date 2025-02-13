@@ -22,7 +22,9 @@ pub const QUIC_MAX_TIMEOUT: Duration = Duration::from_secs(60);
 
 /// To avoid idle timeout, the QUIC endpoint sends a ping every
 /// QUIC_KEEP_ALIVE. This shouldn't be too low to avoid unnecessary ping traffic.
-pub const QUIC_KEEP_ALIVE: Duration = Duration::from_secs(45);
+/// For upgrade purpose, we keep the original one. Once the network is upgraded
+/// to the one having higher QUIC_MAX_TIMEOUT, this value can be increased.
+pub const QUIC_KEEP_ALIVE: Duration = Duration::from_secs(1);
 
 // Disable Quic send fairness.
 // When set to false, streams are still scheduled based on priority,
