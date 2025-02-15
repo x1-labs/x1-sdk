@@ -16,7 +16,14 @@ pub const QUIC_TOTAL_STAKED_CONCURRENT_STREAMS: usize = 100_000;
 // forwarded packets from staked nodes.
 pub const QUIC_MAX_STAKED_CONCURRENT_STREAMS: usize = 512;
 
-pub const QUIC_MAX_TIMEOUT: Duration = Duration::from_secs(2);
+/// QUIC connection idle timeout. The connection will be closed if
+/// there are no activities on it within the timeout window.
+pub const QUIC_MAX_TIMEOUT: Duration = Duration::from_secs(60);
+
+/// To avoid idle timeout, the QUIC endpoint sends a ping every
+/// QUIC_KEEP_ALIVE. This shouldn't be too low to avoid unnecessary ping traffic.
+/// For upgrade purpose, we keep the original one. Once the network is upgraded
+/// to the one having higher QUIC_MAX_TIMEOUT, this value can be increased.
 pub const QUIC_KEEP_ALIVE: Duration = Duration::from_secs(1);
 
 // Disable Quic send fairness.
