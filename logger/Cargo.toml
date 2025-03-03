@@ -12,7 +12,9 @@ edition = { workspace = true }
 [dependencies]
 env_logger = { workspace = true }
 lazy_static = { workspace = true }
+libc = { workspace = true }
 log = { workspace = true }
+signal-hook = { workspace = true }
 
 [lib]
 name = "solana_logger"
