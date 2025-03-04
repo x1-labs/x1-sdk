@@ -81,6 +81,7 @@ pub fn setup_file_with_default(logfile: &str, filter: &str) {
 }
 
 #[cfg(unix)]
+#[cfg(not(target_arch = "wasm32"))]
 fn redirect_stderr(filename: &str) {
     use std::{fs::OpenOptions, os::unix::io::AsRawFd};
     match OpenOptions::new().create(true).append(true).open(filename) {
@@ -94,6 +95,7 @@ fn redirect_stderr(filename: &str) {
 // Redirect stderr to a file with support for logrotate by sending a SIGUSR1 to the process.
 //
 // Upon success, future `log` macros and `eprintln!()` can be found in the specified log file.
+#[cfg(not(target_arch = "wasm32"))]
 pub fn redirect_stderr_to_file(logfile: Option<String>) -> Option<JoinHandle<()>> {
     // Default to RUST_BACKTRACE=1 for more informative validator logs
     if env::var_os("RUST_BACKTRACE").is_none() {
