@@ -80,8 +80,7 @@ pub fn setup_file_with_default(logfile: &str, filter: &str) {
     replace_logger(logger);
 }
 
-#[cfg(unix)]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(unix, not(target_arch = "wasm32")))]
 fn redirect_stderr(filename: &str) {
     use std::{fs::OpenOptions, os::unix::io::AsRawFd};
     match OpenOptions::new().create(true).append(true).open(filename) {
