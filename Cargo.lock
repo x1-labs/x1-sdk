@@ -3162,7 +3162,7 @@ dependencies = [
 
 [[package]]
 name = "solana-logger"
-version = "2.2.1"
+version = "2.3.0"
 dependencies = [
  "env_logger",
  "lazy_static",
