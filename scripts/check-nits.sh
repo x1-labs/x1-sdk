@@ -17,6 +17,7 @@ declare prints=(
 # Parts of the tree that are expected to be print free
 declare print_free_tree=(
   ':**.rs'
+  ':^logger/src/lib.rs'
   ':^msg/src/lib.rs'
   ':^program-option/src/lib.rs'
   ':^pubkey/src/lib.rs'
