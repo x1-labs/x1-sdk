@@ -39,6 +39,14 @@ impl Default for Signature {
 
 impl solana_sanitize::Sanitize for Signature {}
 
+impl Signature {
+    /// Return a reference to the `Signature`'s byte array.
+    #[inline(always)]
+    pub const fn as_array(&self) -> &[u8; SIGNATURE_BYTES] {
+        &self.0
+    }
+}
+
 #[cfg(feature = "rand")]
 impl Signature {
     pub fn new_unique() -> Self {
@@ -272,5 +280,18 @@ mod tests {
             too_long.parse::<Signature>(),
             Err(ParseSignatureError::WrongSize)
         );
+    }
+
+    #[test]
+    fn test_as_array() {
+        let bytes = [1u8; 64];
+        let signature = Signature::from(bytes);
+        assert_eq!(signature.as_array(), &bytes);
+        assert_eq!(
+            signature.as_array(),
+            &<Signature as Into<[u8; 64]>>::into(signature)
+        );
+        // Sanity check: ensure the pointer is the same.
+        assert_eq!(signature.as_array().as_ptr(), signature.0.as_ptr());
     }
 }
