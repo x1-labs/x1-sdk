@@ -2652,7 +2652,7 @@ dependencies = [
 
 [[package]]
 name = "solana-bn254"
-version = "2.2.1"
+version = "2.2.2"
 dependencies = [
  "ark-bn254",
  "ark-ec",
