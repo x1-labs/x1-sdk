@@ -2898,6 +2898,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "solana-feature-set-interface"
+version = "2.2.4"
+dependencies = [
+ "ahash",
+ "solana-frozen-abi",
+ "solana-frozen-abi-macro",
+ "solana-pubkey",
+]
+
+[[package]]
 name = "solana-fee-calculator"
 version = "2.2.1"
 dependencies = [
