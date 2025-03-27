@@ -3588,7 +3588,7 @@ version = "2.2.1"
 
 [[package]]
 name = "solana-sdk"
-version = "2.2.1"
+version = "2.2.2"
 dependencies = [
  "bincode",
  "bs58",

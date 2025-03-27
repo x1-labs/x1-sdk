@@ -292,7 +292,7 @@ solana-signer = { path = "signer", version = "2.2.1" }
 solana-slot-hashes = { path = "slot-hashes", version = "2.2.1" }
 solana-slot-history = { path = "slot-history", version = "2.2.1" }
 solana-time-utils = { path = "time-utils", version = "2.2.1" }
-solana-sdk = { path = "sdk", version = "2.2.1" }
+solana-sdk = { path = "sdk", version = "2.2.2" }
 solana-sdk-ids = { path = "sdk-ids", version = "2.2.1" }
 solana-sdk-macro = { path = "sdk-macro", version = "2.2.1" }
 solana-secp256k1-program = { path = "secp256k1-program", version = "2.2.1" }
