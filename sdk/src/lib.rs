@@ -233,6 +233,13 @@ pub use solana_time_utils as timing;
     note = "Use `solana_transaction::simple_vote_transaction_checker` instead"
 )]
 pub use solana_transaction::simple_vote_transaction_checker;
+#[deprecated(
+    since = "2.2.0",
+    note = "Use `solana-transaction-context` crate instead"
+)]
+pub mod transaction_context {
+    pub use solana_transaction_context::*;
+}
 #[deprecated(since = "2.2.0", note = "Use `solana-validator-exit` crate instead")]
 pub use solana_validator_exit as exit;
 
