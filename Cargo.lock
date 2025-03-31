@@ -3182,7 +3182,7 @@ dependencies = [
 
 [[package]]
 name = "solana-message"
-version = "2.2.1"
+version = "2.3.0"
 dependencies = [
  "anyhow",
  "bincode",
