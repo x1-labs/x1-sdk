@@ -2,7 +2,7 @@
 name = "solana-vote-interface"
 description = "Solana vote interface."
 documentation = "https://docs.rs/solana-vote-interface"
-version = "2.2.2"
+version = "2.2.3"
 authors = { workspace = true }
 repository = { workspace = true }
 homepage = { workspace = true }
