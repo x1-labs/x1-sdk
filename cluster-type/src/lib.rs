@@ -24,15 +24,11 @@ impl ClusterType {
     /// Get the known genesis hash for this ClusterType
     pub fn get_genesis_hash(&self) -> Option<Hash> {
         match self {
-            Self::MainnetBeta => {
-                Some(Hash::from_str("5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d").unwrap())
-            }
+            Self::MainnetBeta => None,
             Self::Testnet => {
-                Some(Hash::from_str("4uhcVJyU9pJkvQyS88uRDiswHXSCkY3zQawwpjk2NsNY").unwrap())
+                Some(Hash::from_str("C7ucgdDEhxLTpXHhWSZxavSVmaNTUJWwT5iTdeaviDho").unwrap())
             }
-            Self::Devnet => {
-                Some(Hash::from_str("EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG").unwrap())
-            }
+            Self::Devnet => None,
             Self::Development => None,
         }
     }
